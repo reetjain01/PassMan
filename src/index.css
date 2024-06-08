@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    overflow-x: hidden
+}
+
+@layer components{
+    .mycontainer{
+        @apply container px-36 py-16 mx-auto;
+    }
+}
