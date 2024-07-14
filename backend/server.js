@@ -1,15 +1,13 @@
 const express = require("express");
-const dotenv = require("dotenv");
 const { MongoClient } = require("mongodb");
 const bodyParser = require("body-parser");
 const cors = require('cors');
-dotenv.config();
+
 
 const client = new MongoClient('mongodb+srv://passman:passman@cluster0.afcyc3n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
 
 const dbname = "PassMan"; // Database name in Atlas
 const app = express();
-const process = require("process");
 const port = process.env.PORT || 3000; // Changed port number
 
 app.use(bodyParser.json());
