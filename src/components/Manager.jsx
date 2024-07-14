@@ -36,47 +36,41 @@ const Manager = () => {
   };
 
   const savePassword = async () => {
-    if (
-      form.site.length > 3 &&
-      form.username.length > 3 &&
-      form.password.length > 3
-    ) {
-    
-
-      // if any such if exists in the db, delete it
-
-      await fetch("http://localhost:3000/", { method : "DELETE", headers: {"Content-Type" : "application/json"}, body: JSON.stringify({ id : form.id}) })
-
-    setPasswordArray([...passwordArray, { ...form, id: uuidv4()}]);
-     await fetch("http://localhost:3000/", { method : "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({...form, id:uuidv4() }) })
-      // localStorage.setItem(
-      //   "password",
-      //   JSON.stringify([...passwordArray, newPassword])
-      // );
-      setForm({ site: "", username: "", password: "" });
-      toast("Password Saved Successfully!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-    } else {
-      toast("Error: Password not Saved", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+    try {
+      if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
+        // Check if password with same id exists, delete it
+        const existingPassword = passwordArray.find(item => item.id === form.id);
+        if (existingPassword) {
+          await fetch(`http://localhost:3000/`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: form.id })
+          });
+        }
+  
+        // Save new password
+        const response = await fetch(`http://localhost:3000/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, id: uuidv4() })
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to save password');
+        }
+  
+        setPasswordArray([...passwordArray.filter(item => item.id !== form.id), { ...form, id: uuidv4() }]);
+        setForm({ site: "", username: "", password: "" });
+        toast("Password Saved Successfully!", { /* toast configuration */ });
+      } else {
+        toast("Error: Password not Saved", { /* toast configuration */ });
+      }
+    } catch (error) {
+      console.error('Error saving password:', error);
+      toast("Error: Password not Saved", { /* toast configuration */ });
     }
   };
+  
 
   const deletePassword = async (id) => {
     let Confirm = confirm("Do you really want to Delete this Password?");
