@@ -5,10 +5,9 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 dotenv.config();
 
-const url = 'mongodb://localhost:27017';
-const client = new MongoClient(url);
+const client = new MongoClient(process.env.MONGO_URI);
 
-const dbname = "PassMan";
+const dbname = "PassMan"; // Database name in Atlas
 const app = express();
 const port = 3000; // Changed port number
 
@@ -84,7 +83,6 @@ app.put("/", async (req, res) => {
   }
 });
 
-
 // Delete a password
 app.delete("/", async (req, res) => {
   const { id } = req.body;
@@ -104,7 +102,6 @@ app.delete("/", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
-
 
 app.listen(port, (err) => {
   if (err) {
