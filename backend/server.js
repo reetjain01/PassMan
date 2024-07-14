@@ -59,27 +59,52 @@ app.post("/", async (req, res) => {
   }
 });
 
-// Delete a password
-app.delete("/", async (req, res) => {
+// Update a password
+app.put("/", async (req, res) => {
+  const { id, site, username, password } = req.body;
+  const db = client.db(dbname);
+  const collection = db.collection("passwords");
+  
   try {
-    const password = req.body;
-    console.log('Received password for deletion:', password);
-
-    if (!password || !password.username) {
-      res.status(400).json({ error: 'Bad Request - Missing required fields' });
-      return;
+    const filter = { id: id }; // Assuming id is the unique identifier
+    const updateDoc = {
+      $set: { site: site, username: username, password: password }
+    };
+    
+    const result = await collection.updateOne(filter, updateDoc);
+    
+    if (result.modifiedCount === 1) {
+      res.json({ success: true, message: "Password updated successfully" });
+    } else {
+      res.json({ success: false, message: "Password not found or not updated" });
     }
-
-    const db = client.db(dbname);
-    const collection = db.collection("passwords");
-    const deleteResult = await collection.deleteOne({ username: password.username });
-    console.log('Deleted document:', deleteResult);
-    res.send({ success: true, result: deleteResult });
   } catch (error) {
-    console.error('Error deleting document:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error updating password:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
+
+
+// Delete a password
+app.delete("/", async (req, res) => {
+  const { id } = req.body;
+  const db = client.db(dbname);
+  const collection = db.collection("passwords");
+
+  try {
+    const result = await collection.deleteOne({ id: id });
+
+    if (result.deletedCount === 1) {
+      res.json({ success: true, message: "Password deleted successfully" });
+    } else {
+      res.json({ success: false, message: "Password not found or not deleted" });
+    }
+  } catch (error) {
+    console.error("Error deleting password:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 
 app.listen(port, (err) => {
   if (err) {
