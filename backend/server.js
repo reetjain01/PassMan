@@ -9,7 +9,7 @@ const client = new MongoClient('mongodb+srv://passman:passman@cluster0.afcyc3n.m
 
 const dbname = "PassMan"; // Database name in Atlas
 const app = express();
-const port = 3000; // Changed port number
+const port = process.env.PORT || 3000; // Changed port number
 
 app.use(bodyParser.json());
 app.use(cors());
